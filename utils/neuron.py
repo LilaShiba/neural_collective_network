@@ -31,9 +31,10 @@ class Neuron:
         self.edges = list()
         self.layer = layer
         self.metrics = {}  # Empty dictionary for metrics
-        self.cosine = False
+        self.tanh = True
+        self.delta: np.array = None  # activation function output
 
-    def activate(self, cosine=False) -> np.ndarray:
+    def activate(self, tanh=False) -> np.ndarray:
         """Compute the neuron's output using a simple linear activation.
 
         Args:
@@ -43,27 +44,40 @@ class Neuron:
         Returns:
             np.ndarray: The output of the neuron after applying the weights, bias, and activation function.
         """
-        self.cosine = cosine
+        self.tanh = tanh
         # Simple linear activation: weights * inputs + bias
-        if self.cosine:
-            self.weights = np.cos(self.weights, self.inputs.T) + self.bias
+
+        delta = (np.dot(self.inputs, self.weights.T) + self.bias).T
+        if self.tanh:
+            delta = np.tanh(delta)
         else:
-            self.weights = (self.weights * self.inputs) + self.bias
-        return self.weights
+            delta = self.sigmoid(delta)
+        self.delta = delta
+        return delta
 
     def derivative(self):
         '''
         returns the derivative of the activation function
         '''
-        print(self.cosine)
-        if self.cosine:
-            return -(np.sin(self.inputs.T))
-        return 1/1 + np.exp(-1 * self.inputs.T)
+        print(self.tanh)
+        if self.tanh:
+            return (1.0 - np.tanh(self.inputs) ** 2).T
+        return
+
+    @staticmethod
+    def sigmoid(x):
+        """The Sigmoid function."""
+        return 1 / (1 + np.exp(-x))
+
+    @staticmethod
+    def sigmoid_derivative(x):
+        """Derivative of the Sigmoid function."""
+        return x * (1 - x)
 
 
 if __name__ == "__main__":
     # Example usage:
-    neuron = Neuron(inputs=np.random.rand(2, 3), layer=1)
+    neuron = Neuron(inputs=np.random.rand(3, 2), layer=1)
     print('activation function')
     print(neuron.activate(True))
     # print(f'weights: {neuron.weights}')

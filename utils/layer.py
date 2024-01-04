@@ -28,9 +28,10 @@ class Layer:
 
     def feed_forward(self):
         '''
-
+        Activate neurons based on their inputs
         '''
-        outputs = [neuron.activate() for neuron in self.neurons.values()]
+        outputs = [neuron.activate(tanh=neuron.tanh)
+                   for neuron in self.neurons.values()]
         return outputs
 
     def back_propagation(self):
