@@ -18,6 +18,9 @@ if __name__ == "__main__":
     # print(dataset[:5])
     layer_one = Layer(input=dataset)
     layer_one.create_neurons()
+    n1 = layer_one.neurons[0]
+    print(f' weights {n1.weights} ')
     print('neurons created')
     layer_one.feed_forward()
     print('feed forward successful')
+    print(f' weights {n1.weights} ')

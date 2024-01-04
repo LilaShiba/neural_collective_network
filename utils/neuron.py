@@ -46,8 +46,10 @@ class Neuron:
         self.cosine = cosine
         # Simple linear activation: weights * inputs + bias
         if self.cosine:
-            return np.cos(self.weights, self.inputs.T) + self.bias
-        return (self.weights * self.inputs) + self.bias
+            self.weights = np.cos(self.weights, self.inputs.T) + self.bias
+        else:
+            self.weights = (self.weights * self.inputs) + self.bias
+        return self.weights
 
     def derivative(self):
         '''
