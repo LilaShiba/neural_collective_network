@@ -4,7 +4,7 @@ from typing import Tuple, List, Dict
 
 
 class Neuron:
-    """A Neuron class representing a complex single neuron in a neural network.
+    """A class representing a complex single neuron in a neural network.
 
     W = 2x3 
     cols: input, output
@@ -19,21 +19,21 @@ class Neuron:
         metrics (Dict[str, float]): A dictionary for storing various performance metrics.
     """
 
-    def __init__(self, layer: int) -> None:
+    def __init__(self, inputs: np.array(np.array), layer: int) -> None:
         """Initialize the Neuron with random weights, bias, and specified dimensions and layer.
 
         Args:
             layer (int): The layer number the neuron is part of.
         """
         self.weights = np.random.rand(3, 2)
-        self.inputs = np.zeros((3, 2))
+        self.inputs = np.array(inputs)  # np.zeros((3, 2))
         self.bias = random.random()
         self.edges = list()
         self.layer = layer
         self.metrics = {}  # Empty dictionary for metrics
         self.cosine = False
 
-    def activate(self, inputs: np.ndarray, cosine=False) -> np.ndarray:
+    def activate(self, cosine=False) -> np.ndarray:
         """Compute the neuron's output using a simple linear activation.
 
         Args:
@@ -44,26 +44,26 @@ class Neuron:
             np.ndarray: The output of the neuron after applying the weights, bias, and activation function.
         """
         self.cosine = cosine
-        self.inputs = inputs
         # Simple linear activation: weights * inputs + bias
         if self.cosine:
-            return np.cos(self.weights, inputs.T) + self.bias
-        return np.dot(self.weights, inputs) + self.bias
+            return np.cos(self.weights, self.inputs.T) + self.bias
+        return (self.weights * self.inputs) + self.bias
 
-    def derivative(self, outputs: np.ndarray,):
+    def derivative(self):
         '''
         returns the derivative of the activation function
         '''
-        if not self.cosine:
-            return 1/1 + np.exp(-1 * self.weights)
-        return -(np.sin(self.weights))
+        print(self.cosine)
+        if self.cosine:
+            return -(np.sin(self.inputs.T))
+        return 1/1 + np.exp(-1 * self.inputs.T)
 
 
 if __name__ == "__main__":
     # Example usage:
-    neuron = Neuron(layer=1)
+    neuron = Neuron(inputs=np.random.rand(2, 3), layer=1)
     print('activation function')
-    print(neuron.activate(np.random.rand(2, 3), True))
+    print(neuron.activate(True))
     # print(f'weights: {neuron.weights}')
     print('derivative of activation function')
     print(neuron.derivative())
