@@ -26,13 +26,16 @@ class Neuron:
             layer (int): The layer number the neuron is part of.
         """
         self.weights = np.random.rand(3, 2)
-        self.inputs = np.array(inputs)  # np.zeros((3, 2))
-        self.bias = random.random()
+        self.learning_rate: float = 0.1
+        self.inputs = np.array(inputs)
+        self.bias = random.uniform(0.1, 1)
         self.edges = list()
-        self.layer = layer
-        self.metrics = {}  # Empty dictionary for metrics
-        self.tanh = tanh
+        self.layer: int = layer
+        self.metrics = dict()
+        self.tanh: bool = tanh
         self.delta: np.array = None  # activation function output
+        self.loss_gradient: np.array = None
+        self.last_input: np.array = None
 
     def activate(self, tanh=False) -> np.ndarray:
         """Compute the neuron's output using a simple linear activation.
@@ -46,23 +49,43 @@ class Neuron:
         """
         self.tanh = tanh
         # Simple linear/non-linear activation: weights * inputs + bias
-
+        self.last_input = self.inputs
         delta = (np.dot(self.inputs, self.weights.T) + self.bias).T
         if self.tanh:
             delta = np.tanh(delta)
         else:
             delta = self.sigmoid(delta)
         self.delta = delta
-        return delta
+        return np.mean(self.delta)
 
     def derivative(self):
         '''
         returns the derivative of the activation function
         '''
-        print(self.tanh)
         if self.tanh:
             return (1.0 - np.tanh(self.delta) ** 2)
-        return
+        return self.sigmoid(self.delta) * (1-self.sigmoid(self.delta))
+
+    def compute_gradient(self, neuron_loss_grad: np.array):
+        """
+        Compute the gradient of the neuron's weights with respect to the loss.
+
+        :param neuron_loss_grad: The gradient of the loss with respect to the neuron's output.
+        :return: The gradient with respect to the neuron's weights.
+        """
+        res = self.derivative()
+        res = res[:-1, :]
+        d_output_d_weights = res * self.last_input.T
+        gradient = neuron_loss_grad * d_output_d_weights
+        return gradient
+
+    def update_weights(self, neuron_weight_grad: np.array):
+        '''
+        Update weights in backpropagation abstracted in Layer class
+        '''
+        self.weights -= (self.learning_rate * neuron_weight_grad.T)
+        # TODO update bias during backpropagation
+        # self.bias -= self.learning_rate * bias_gradient
 
     @staticmethod
     def sigmoid(x):
@@ -72,14 +95,14 @@ class Neuron:
     @staticmethod
     def sigmoid_derivative(x):
         """Derivative of the Sigmoid function."""
-        return x * (1 - x)
+        return Neuron.sigmoid(x) * (1 - Neuron.sigmoid(x))
 
 
 if __name__ == "__main__":
     # Example usage:
     neuron = Neuron(inputs=np.random.rand(3, 2), layer=1)
     print('activation function')
-    print(neuron.activate(True))
+    print(neuron.activate(False))
     # print(f'weights: {neuron.weights}')
     print('derivative of activation function')
     print(neuron.derivative())

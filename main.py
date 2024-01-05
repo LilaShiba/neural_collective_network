@@ -5,6 +5,7 @@ if __name__ == "__main__":
     sample_size = 100
     x_min = 0
     x_max = 2 * np.pi
+
     # Generate the x values
     x_values = np.linspace(x_min, x_max, sample_size)
 
@@ -19,8 +20,10 @@ if __name__ == "__main__":
     layer_one = Layer(input=dataset)
     layer_one.create_neurons()
     n1 = layer_one.neurons[0]
-    print(f' weights {n1.weights} ')
-    print('neurons created')
-    layer_one.feed_forward()
-    print('feed forward successful')
-    print(f' weights {n1.weights} ')
+    # Feed-forward Test
+    # print(f' weights {n1.weights} ')
+    # print('neurons created')
+    # layer_one.feed_forward()
+    # print('feed forward successful')
+    # print(f' weights {n1.weights} ')
+    layer_one.train()
