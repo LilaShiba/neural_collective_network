@@ -28,7 +28,9 @@ class Neuron:
         self.weights = weights if len(weights) > 0 else np.random.rand(3, 2)
         self.learning_rate: float = random.uniform(0.1, 1)
         self.inputs = np.array(inputs)
-        self.bias = random.uniform(0.1, 1)
+        self.inputs_x = self.inputs[:, 0]
+        self.inputs_y = self.inputs[:, -1]
+        self.bias = random.uniform(0.1, 0.5)
         self.edges = list()
         self.layer: int = layer
         self.metrics = dict()
