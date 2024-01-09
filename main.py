@@ -2,7 +2,7 @@ from utils.layer import Layer
 import numpy as np
 
 if __name__ == "__main__":
-    sample_size = 100
+    sample_size = 1000
     x_min = 0
     x_max = 2 * np.pi
 
@@ -14,16 +14,14 @@ if __name__ == "__main__":
 
     # Combine x and y into a nested list of tuples
     dataset = list(zip(x_values, y_values))
-
-    # Print the first few elements to verify
-    # print(dataset[:5])
-    layer_one = Layer(input=dataset)
-    layer_one.create_neurons()
-    n1 = layer_one.neurons[0]
-    # Feed-forward Test
-    # print(f' weights {n1.weights} ')
-    # print('neurons created')
-    # layer_one.feed_forward()
-    # print('feed forward successful')
-    # print(f' weights {n1.weights} ')
-    layer_one.train()
+    # Input Layer
+    input_layer = Layer(input=dataset)
+    input_layer.create_neurons()
+    input_layer.train()
+    input_layer.see_loss_grad()
+    input_layer_weights = [n.weights for n in input_layer.neurons.values()]
+    # Hidden Layer
+    h_one = Layer(input=dataset, weights=input_layer_weights)
+    h_one.create_neurons()
+    h_one.train()
+    h_one.see_loss_grad()

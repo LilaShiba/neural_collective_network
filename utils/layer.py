@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from typing import Tuple, List, Dict
+from typing import *
 from utils.neuron import Neuron
 import matplotlib.pyplot as plt
 
@@ -11,14 +11,18 @@ class Layer:
 
     '''
 
-    def __init__(self, input=np.array(np.array)) -> None:
+    def __init__(self, input=np.array(np.array), weights: np.array(np.array) = []) -> None:
         self.input = input
         self.layer: int = 0
         self.neurons: dict = dict()
         self.loss_grad: np.array = None
         self.learning_rate = 0.1
+        if len(weights) > 0:
+            self.weights = weights
+        else:
+            self.weights = []
 
-    def create_neurons(self, group_size: int = 3, random_activation=False):
+    def create_neurons(self, group_size: int = 3, random_activation: bool = False, weight=[]):
         '''
         Initialzes neurons in circular fashion
         2x3s
@@ -30,8 +34,11 @@ class Layer:
         for i in range(n):
             # circular array
             delta_group = [self.input[(i + j) % n] for j in range(group_size)]
+            if len(self.weights) > 0:
+                weight = self.weights[i-1]
+
             self.neurons[i] = Neuron(
-                inputs=delta_group, layer=self.layer, tanh=p_of_x)
+                inputs=delta_group, layer=self.layer, tanh=p_of_x, weights=weight)
 
     def feed_forward(self):
         '''
@@ -72,7 +79,8 @@ class Layer:
         '''
         return np.mean((predictions - targets)**2)
 
-    def train(self, epochs: int = 100):
+    def train(self, epochs: int = 101):
+        self.train_errors = []
         targets = np.array([sample[1] for sample in self.input])
         for epoch in range(epochs):
             # Start Feed-Forward
@@ -88,6 +96,7 @@ class Layer:
             # (Optional) Print the loss to monitor progress
             if epoch % 10 == 0:  # Print every 10 epochs, adjust as needed
                 print(f"Epoch {epoch}, Loss: {mse_loss}")
+                self.train_errors.append(mse_loss)
 
     def set_loss_grad(self, loss_grad: np.array):
         '''
@@ -99,8 +108,8 @@ class Layer:
         '''
         Graph of loss gradient
         '''
-        if self.loss_grad:
-            plt.plot(self.loss_grad)
+        if len(self.loss_grad) > 0:
+            plt.plot(self.train_errors)
             plt.title('Loss Gradient')
             plt.show()
             plt.close()

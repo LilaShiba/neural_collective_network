@@ -19,14 +19,14 @@ class Neuron:
         metrics (Dict[str, float]): A dictionary for storing various performance metrics.
     """
 
-    def __init__(self, inputs: np.array(np.array), layer: int, tanh=True) -> None:
+    def __init__(self, inputs: np.array(np.array), layer: int, tanh=True, weights: np.array = []) -> None:
         """Initialize the Neuron with random weights, bias, and specified dimensions and layer.
 
         Args:
             layer (int): The layer number the neuron is part of.
         """
-        self.weights = np.random.rand(3, 2)
-        self.learning_rate: float = 0.1
+        self.weights = weights if len(weights) > 0 else np.random.rand(3, 2)
+        self.learning_rate: float = random.uniform(0.1, 1)
         self.inputs = np.array(inputs)
         self.bias = random.uniform(0.1, 1)
         self.edges = list()
@@ -77,6 +77,7 @@ class Neuron:
         res = res[:-1, :]
         d_output_d_weights = res * self.last_input.T
         gradient = neuron_loss_grad * d_output_d_weights
+        self.loss_gradient = gradient
         return gradient
 
     def update_weights(self, neuron_weight_grad: np.array):
