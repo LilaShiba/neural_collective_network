@@ -116,3 +116,32 @@ class Layer:
 
     def set_learning_rate(self, learning_rate: float = 0.1):
         self.learning_rate = 0.1
+
+    def cycle(self, group_size: int = 3, random_activation: bool = False, weight=[], see_graph: bool = False):
+        '''Subprocess 1: 
+                create_neurons()
+                train()
+                see_loss_grad() default: False
+            Returns: np.array(n.weights ... n+1.weights)
+        '''
+        self.create_neurons(group_size, random_activation, weight)
+        self.train()
+        if see_graph:
+            self.see_loss_grad()
+        self.weights = [n.weights for n in self.neurons.values()]
+        return self.weights
+
+    def pass_data(self, div: int = 2):
+        ''' Subprocess 2
+                prepares weights for layer transfer
+            returns np.array([weights, input])
+        '''
+
+        n = len(self.weights)//2
+        # Pair up the elements from the two lists
+        paired_data = list(zip(self.weights, self.input))
+        # Randomly select half of the pairs
+        selected_pairs = random.sample(paired_data, n//div)
+        # Separate the pairs back into two lists
+        half_weights, input_half = zip(*selected_pairs)
+        return [half_weights, input_half]
