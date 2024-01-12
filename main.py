@@ -1,4 +1,4 @@
-from utils.layer import Layer
+from utils.network import Network
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -30,27 +30,6 @@ def sine_wave(graph: bool = False):
 if __name__ == "__main__":
 
     # Create Sine wave for testing
-    dataset = sine_wave()
-
-    # Input Layer
-    input_layer = Layer(input=dataset)
-    delta_weights = input_layer.cycle()
-    layers = dict()
-    layers[0] = input_layer
-    for idx in range(1, 4):
-        delta_layer = Layer(input=dataset, weights=delta_weights)
-        layers[idx] = delta_layer
-        delta_weights = delta_layer.cycle(see_graph=True)
-    # Subprocess 1: Create, train, view
-
-    # Hidden Layer: Subprocess 1
-    # h_one = Layer(input=input_half, weights=half_weights)
-    # input_layer_weights = h_one.cycle(see_graph=True)
-    # # Subprocess 2:
-    # half_weights, input_half = h_one.pass_data()
-    # out_put_layer = Layer(input=input_half, weights=half_weights)
-
-    # # Output Layer: Subprocess
-    # output_layer_weights = out_put_layer.cycle(see_graph=True)
-    # # Subprocess 3: Prediction
-    # out_put_layer.predict(sample=dataset[0:2, :])
+    non_linearity_test = sine_wave()
+    example_network = Network(dataset=non_linearity_test)
+    example_network.train(epochs=2)
