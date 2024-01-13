@@ -26,20 +26,21 @@ class Neuron:
             layer (int): The layer number the neuron is part of.
         """
         self.weights = weights if len(weights) > 0 else np.random.rand(3, 2)
-        self.learning_rate: float = random.uniform(0.1, 1)
+        self.learning_rate: float = np.random.random(
+            1)[0]  # random.uniform(0.1, 1)
         self.inputs = np.array(inputs)
         self.inputs_x = self.inputs[:, 0]
         self.inputs_y = self.inputs[:, -1]
-        self.bias = random.uniform(0.1, 0.5)
+        self.bias = np.random.random(1)[0]  # random.uniform(0.1, 0.5)
         self.edges = list()
         self.layer: int = layer
         self.metrics = dict()
-        self.tanh: bool = tanh
+        self.tanh: bool = True
         self.delta: np.array = None  # activation function output
         self.loss_gradient: np.array = None
         self.last_input: np.array = None
 
-    def activate(self, tanh=False) -> np.ndarray:
+    def activate(self, tanh=False, inputs=False) -> np.ndarray:
         """Compute the neuron's output using a simple linear activation.
 
         Args:
@@ -49,6 +50,8 @@ class Neuron:
         Returns:
             np.ndarray: The output of the neuron after applying the weights, bias, and activation function.
         """
+        if inputs:
+            self.inputs = inputs
         self.tanh = tanh
         # Simple linear/non-linear activation: weights * inputs + bias
         self.last_input = self.inputs

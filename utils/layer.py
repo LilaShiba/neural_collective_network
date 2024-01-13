@@ -16,7 +16,7 @@ class Layer:
         self.layer: int = 0
         self.neurons: dict = dict()
         self.loss_grad: np.array = None
-        self.learning_rate = 0.1
+        self.learning_rate = np.random.random(1)[0]
         if len(weights) > 0:
             self.weights = weights
         else:
@@ -40,11 +40,11 @@ class Layer:
             self.neurons[i] = Neuron(
                 inputs=delta_group, layer=self.layer, tanh=p_of_x, weights=weight)
 
-    def feed_forward(self):
+    def feed_forward(self, data=False) -> np.array:
         '''
         Activate neurons based on their inputs
         '''
-        outputs = [neuron.activate(tanh=neuron.tanh)
+        outputs = [neuron.activate(tanh=neuron.tanh, inputs=data)
                    for neuron in self.neurons.values()]
         return outputs
 
@@ -131,13 +131,13 @@ class Layer:
         self.weights = [n.weights for n in self.neurons.values()]
         return self.weights
 
-    def pass_data(self, div: int = 2):
+    def pass_data(self, div: int = 1):
         ''' Subprocess 2
                 prepares weights for layer transfer
             returns np.array([weights, input])
         '''
 
-        n = len(self.weights)//2
+        n = len(self.weights)//div
         # Pair up the elements from the two lists
         paired_data = list(zip(self.weights, self.input))
         # Randomly select half of the pairs
