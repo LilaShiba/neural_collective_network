@@ -22,7 +22,7 @@ class Layer:
         else:
             self.weights = []
 
-    def create_neurons(self, group_size: int = 3, random_activation: bool = False, weight=[]):
+    def create_neurons(self, group_size: int = 2, random_activation: bool = False, weight=[]):
         '''
         Initialzes neurons in circular fashion
         2x3s
@@ -131,7 +131,7 @@ class Layer:
         self.weights = [n.weights for n in self.neurons.values()]
         return self.weights
 
-    def pass_data(self, div: int = 1):
+    def pass_data(self, div: int = 2):
         ''' Subprocess 2
                 prepares weights for layer transfer
             returns np.array([weights, input])
