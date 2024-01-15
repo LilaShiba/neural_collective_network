@@ -1,4 +1,4 @@
-from utils.layer import Layer
+from utils.layers import Layer
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import *
@@ -11,19 +11,24 @@ class Network:
 
     def __init__(self, dataset: np.array):
         self.df = dataset
-        self.input_layer = Layer(input=dataset)
+        n = len(dataset)
+        self.input_layer = Layer(input=dataset, layer_size=n)
+        self.input_layer.create_neurons(group_size=3)
         self.layers = dict()
         self.layers[0] = self.input_layer
-        self.delta_weights = self.input_layer.cycle()
+        self.delta_weights = [
+            n.weights for n in self.input_layer.neurons.values()]
 
-    def train(self, layers: int = 5):
+    def init_network(self, layers: int = 5):
         '''train all layers in network save for input'''
 
        # skiping layer 0 as that is the input layer
         for idx in range(layers):
-            delta_layer = Layer(input=self.df, weights=self.delta_weights)
+            n = len(self.delta_weights)
+            delta_layer = Layer(layer_size=n, input=self.df,
+                                weights=self.delta_weights)
             self.layers[idx] = delta_layer
-            self.delta_weights = delta_layer.cycle(see_graph=True)
+            self.delta_weights = delta_layer.create_neurons()
 
     def predict(self, test_params: list()) -> np.array:
         '''

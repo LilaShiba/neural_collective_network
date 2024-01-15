@@ -1,7 +1,7 @@
 import random
 import numpy as np
 from typing import *
-from neurons import Neuron
+from utils.neurons import Neuron
 import matplotlib.pyplot as plt
 
 
@@ -26,6 +26,7 @@ class Layer:
         '''
         Initialzes neurons in circular fashion
         2x3s
+        Returns: List of neuron weights
         '''
         n = len(self.input)
         m = len(self.weights)
@@ -39,12 +40,13 @@ class Layer:
 
             self.neurons[i] = Neuron(
                 inputs=delta_group, layer=self.layer, weights=delta_weights)
+        return [n.weights for n in self.neurons.values()]
 
     def feed_forward(self, data=False) -> np.array:
         '''
         Activate neurons based on their inputs
         '''
-        outputs = [neuron.activate(tanh=neuron.tanh, inputs=data)
+        outputs = [neuron.feed_forward(inputs=data)
                    for neuron in self.neurons.values()]
         return outputs
 
@@ -90,19 +92,13 @@ class Layer:
             mse_loss = self.get_loss_vector(predictions, targets)
             # Calculate the derivative of the loss with respect to the outputs
             loss_grad = 2 * (predictions - targets) / len(targets)
-            self.set_loss_grad(loss_grad)
+            self.loss_grad = loss_grad
             # Perform the backpropagation step
             self.back_propagation()
             # (Optional) Print the loss to monitor progress
             if epoch % 10 == 0:  # Print every 10 epochs, adjust as needed
                 print(f"Epoch {epoch}, Loss: {mse_loss}")
                 self.train_errors.append(mse_loss)
-
-    def set_loss_grad(self, loss_grad: np.array):
-        '''
-        set the loss gradient for the layer to update backprogation
-        '''
-        self.loss_grad = loss_grad
 
     def see_loss_grad(self):
         '''
@@ -113,23 +109,6 @@ class Layer:
             plt.title('Loss Gradient')
             plt.show()
             plt.close()
-
-    def set_learning_rate(self, learning_rate: float = 0.1):
-        self.learning_rate = 0.1
-
-    def cycle(self, group_size: int = 3, random_activation: bool = False, weight=[], see_graph: bool = False):
-        '''Subprocess 1: 
-                create_neurons()
-                train()
-                see_loss_grad() default: False
-            Returns: np.array(n.weights ... n+1.weights)
-        '''
-        self.create_neurons(group_size, random_activation, weight)
-        self.train()
-        if see_graph:
-            self.see_loss_grad()
-        self.weights = [n.weights for n in self.neurons.values()]
-        return self.weights
 
     def pass_data(self, div: int = 1):
         ''' Subprocess 2

@@ -58,6 +58,6 @@ if __name__ == "__main__":
     # plt.title('Input')
     # plt.show()
     example_network = Network(dataset=training_data)
-    example_network.train(layers=2)
+    example_network.init_network(layers=2)
     # TODO fix predict function
     # res = example_network.predict(test_params=x_test)

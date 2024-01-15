@@ -29,7 +29,7 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         self.state = np.random.lognormal(0, 1, 1)[0]
         self.signal: float = np.random.lognormal(0, 1, 1)[0]
 
-    def activate(self, inputs=False) -> np.ndarray:
+    def feed_forward(self, inputs=False) -> np.ndarray:
         """Compute the neuron's output using a simple linear activation.
 
         Args:
@@ -64,9 +64,9 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         :param neuron_loss_grad: The gradient of the loss with respect to the neuron's output.
         :return: The neuron signal after 1 iteration.
         """
-        self.activate()
+        self.feed_forward()
         res = self.derivative()
-        neuron_loss_grad = (self.activate() - self.inputs_y)
+        neuron_loss_grad = (self.feed_forward() - self.inputs_y)
         d_output_d_weights = res * self.last_input.T
         gradient = neuron_loss_grad * d_output_d_weights
 
@@ -99,4 +99,4 @@ if __name__ == "__main__":
     print(neuron.iterate())
 
     n2 = Neuron(inputs=[1, 2], layer=2, weights=neuron.weights)
-    print(n2.activate())
+    print(n2.feed_forward())
