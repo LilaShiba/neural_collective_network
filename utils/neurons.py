@@ -62,18 +62,19 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         Compute the gradient of the neuron's weights with respect to the loss.
 
         :param neuron_loss_grad: The gradient of the loss with respect to the neuron's output.
-        :return: The gradient with respect to the neuron's weights.
+        :return: The neuron signal after 1 iteration.
         """
         self.activate()
         res = self.derivative()
         neuron_loss_grad = (self.activate() - self.inputs_y)
         d_output_d_weights = res * self.last_input.T
         gradient = neuron_loss_grad * d_output_d_weights
-        self.loss_gradient = gradient
-        self.weights -= (self.learning_rate * gradient.T)
-        return gradient
 
-    def update_weights(self, neuron_weight_grad: np.array):
+        self.weights -= (self.learning_rate * gradient.T)
+        self.loss_gradient = gradient
+        return self.signal
+
+    def update_weights(self):
         '''
         Update weights in backpropagation abstracted in Layer class
         '''
@@ -94,5 +95,8 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
 
 if __name__ == "__main__":
     # Example usage:
-    neuron = Neuron(inputs=np.array([1, 2]), layer=1)
+    neuron = Neuron(inputs=np.array([1, 2 * np.pi]), layer=1)
     print(neuron.iterate())
+
+    n2 = Neuron(inputs=[1, 2], layer=2, weights=neuron.weights)
+    print(n2.activate())
