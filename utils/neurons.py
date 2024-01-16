@@ -18,8 +18,8 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         self.weights = weights if len(weights) > 0 else np.random.rand(3, 2)
         self.learning_rate: float = random.uniform(0.1, 1)
         self.inputs = np.array(inputs)
-        self.inputs_x = self.inputs[0]
-        self.inputs_y = self.inputs[-1]
+        self.inputs_x = self.inputs[0][0]
+        self.inputs_y = self.inputs[-1][0]
         self.bias = np.random.random(1)[0]  # random.uniform(0.1, 0.5)
         self.edges = list()
         self.layer: int = layer
@@ -64,13 +64,13 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         :param neuron_loss_grad: The gradient of the loss with respect to the neuron's output.
         :return: The neuron signal after 1 iteration.
         """
-        self.feed_forward()
+        delta_signal = self.feed_forward()
         res = self.derivative()
-        neuron_loss_grad = (self.feed_forward() - self.inputs_y)
-        d_output_d_weights = res * self.last_input.T
+        neuron_loss_grad = (delta_signal - self.inputs_y)
+        d_output_d_weights = res * self.inputs_y.T
         gradient = neuron_loss_grad * d_output_d_weights
 
-        self.weights -= (self.learning_rate * gradient.T)
+        self.weights -= self.learning_rate * gradient
         self.loss_gradient = gradient
         return self.signal
 
@@ -78,7 +78,7 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         '''
         Update weights in backpropagation abstracted in Layer class
         '''
-        self.weights -= (self.learning_rate * self.loss_gradient.T)
+        self.weights -= np.dot(self.learning_rate, self.loss_gradient.T)
         # TODO update bias during backpropagation
         # self.bias -= self.learning_rate * bias_gradient
 
@@ -97,6 +97,8 @@ if __name__ == "__main__":
     # Example usage:
     neuron = Neuron(inputs=np.array([1, 2 * np.pi]), layer=1)
     print(neuron.iterate())
+    print(neuron.weights)
 
     n2 = Neuron(inputs=[1, 2], layer=2, weights=neuron.weights)
     print(n2.feed_forward())
+    print(n2.weights)

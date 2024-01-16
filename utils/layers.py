@@ -34,10 +34,11 @@ class Layer:
             # circular array
             delta_group = [self.input[(i + j) % n] for j in range(group_size)]
             delta_weights = []
-            if len(self.weights) > 0:
-                delta_weights = [self.weights[(i + j) % m]
-                                 for j in range(group_size)]
-
+            # if len(self.weights) > 0:
+            #     delta_weights = [self.weights[i: (i + j) % m]
+            #                      for j in range(group_size)]
+            # if len(delta_weights) > 0:
+            #     print(f'delta weights {delta_weights}')
             self.neurons[i] = Neuron(
                 inputs=delta_group, layer=self.layer, weights=delta_weights)
         return [n.weights for n in self.neurons.values()]

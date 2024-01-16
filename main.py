@@ -59,5 +59,6 @@ if __name__ == "__main__":
     # plt.show()
     example_network = Network(dataset=training_data)
     example_network.init_network(layers=2)
+    print(example_network.layers.values())
     # TODO fix predict function
     # res = example_network.predict(test_params=x_test)

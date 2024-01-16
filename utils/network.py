@@ -29,6 +29,7 @@ class Network:
                                 weights=self.delta_weights)
             self.layers[idx] = delta_layer
             self.delta_weights = delta_layer.create_neurons()
+        return self.layers
 
     def predict(self, test_params: list()) -> np.array:
         '''
