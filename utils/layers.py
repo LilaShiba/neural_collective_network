@@ -43,6 +43,17 @@ class Layer:
                 inputs=delta_group, layer=self.layer, weights=delta_weights)
         return [n.weights for n in self.neurons.values()]
 
+    def iterate(self):
+        '''one training cycle for a layer'''
+        targets = np.array([sample[1] for sample in self.input])
+        predictions = self.feed_forward()
+        mse_loss = self.get_loss_vector(predictions, targets)
+        # Calculate the derivative of the loss with respect to the outputs
+        loss_grad = 2 * (predictions - targets) / len(targets)
+        self.loss_grad = loss_grad
+        # Perform the backpropagation step
+        self.back_propagation()
+
     def feed_forward(self, data=False) -> np.array:
         '''
         Activate neurons based on their inputs
@@ -66,10 +77,7 @@ class Layer:
         input_grad = np.zeros_like(self.input)
 
         for idx, neuron in enumerate(self.neurons.values()):
-            neuron_loss_grad = self.loss_grad[idx]
-            neuron_weight_grad = neuron.compute_gradient(neuron_loss_grad)
-            # Update neuron weights
-            neuron.update_weights(neuron_weight_grad)
+            neuron.iterate()
 
     def get_loss_vector(self, predictions: np.array, targets: np.array):
         '''

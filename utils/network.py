@@ -31,6 +31,12 @@ class Network:
             self.delta_weights = delta_layer.create_neurons()
         return self.layers
 
+    def train_network(self, epochs: int = 100):
+        '''updates all neurons in place'''
+        for idx in range(epochs):
+            for layer in self.layers.values():
+                layer.iterate()
+
     def predict(self, test_params: list()) -> np.array:
         '''
         make a prediction on the trained network based on

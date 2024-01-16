@@ -29,6 +29,20 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         self.state = np.random.lognormal(0, 1, 1)[0]
         self.signal: float = np.random.lognormal(0, 1, 1)[0]
 
+    def compute_gradient(self, neuron_loss_grad: np.array):
+        """
+        Compute the gradient of the neuron's weights with respect to the loss.
+
+        :param neuron_loss_grad: The gradient of the loss with respect to the neuron's output.
+        :return: The gradient with respect to the neuron's weights.
+        """
+        res = self.derivative()
+        # res = res[:-1, :]
+        d_output_d_weights = res * self.last_input.T
+        gradient = neuron_loss_grad * d_output_d_weights
+        self.loss_gradient = gradient
+        return gradient
+
     def feed_forward(self, inputs=False) -> np.ndarray:
         """Compute the neuron's output using a simple linear activation.
 
@@ -74,11 +88,11 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         self.loss_gradient = gradient
         return self.signal
 
-    def update_weights(self):
+    def update_weights(self, neuron_weight_grad):
         '''
         Update weights in backpropagation abstracted in Layer class
         '''
-        self.weights -= np.dot(self.learning_rate, self.loss_gradient.T)
+        self.weights -= (self.learning_rate * neuron_weight_grad)
         # TODO update bias during backpropagation
         # self.bias -= self.learning_rate * bias_gradient
 
