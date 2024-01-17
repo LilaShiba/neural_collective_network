@@ -22,30 +22,33 @@ class Layer:
         if len(weights) > 0:
             self.weights = weights
 
-    def create_neurons(self, group_size: int = 2):
+    def create_neurons(self, group_size: int = 1):
         '''
         Initialzes neurons in circular fashion
         2x3s
         Returns: List of neuron weights
         '''
-        n = len(self.input)
-        m = len(self.weights)
-        for i in range(self.layer_size):
-            # circular array
-            delta_group = [self.input[(i + j) % n] for j in range(group_size)]
-            delta_weights = []
-            # if len(self.weights) > 0:
-            #     delta_weights = [self.weights[i: (i + j) % m]
-            #                      for j in range(group_size)]
-            # if len(delta_weights) > 0:
-            #     print(f'delta weights {delta_weights}')
-            self.neurons[i] = Neuron(
-                inputs=delta_group, layer=self.layer, weights=delta_weights)
+        db = self.input[0]
+        n = len(db)
+        m = len(db[0])
+        # m = len(self.weights)
+        for i in range(n):
+            for j in range(m):
+                # circular array
+                delta_group = db[i][j]
+                # delta_weights = []
+                # if len(self.weights) > 0:
+                #     delta_weights = [self.weights[i: (i + j) % m]
+                #                      for j in range(group_size)]
+                # if len(delta_weights) > 0:
+                #     print(f'delta weights {delta_weights}')
+                self.neurons[(i, j)] = Neuron(
+                    inputs=[delta_group, self.input[-1]], layer=self.layer, weights=[])
         return [n.weights for n in self.neurons.values()]
 
     def iterate(self):
         '''one training cycle for a layer'''
-        targets = np.array([sample[1] for sample in self.input])
+        targets = np.array([self.input[-1]])
         predictions = self.feed_forward()
         mse_loss = self.get_loss_vector(predictions, targets)
         # Calculate the derivative of the loss with respect to the outputs
@@ -74,8 +77,6 @@ class Layer:
             raise ValueError(
                 "Learning rate must be set before backpropagation.")
 
-        input_grad = np.zeros_like(self.input)
-
         for idx, neuron in enumerate(self.neurons.values()):
             neuron.iterate()
 
@@ -92,7 +93,7 @@ class Layer:
 
     def train(self, epochs: int = 101):
         self.train_errors = []
-        targets = np.array([sample[1] for sample in self.input])
+        targets = self.input[0]
         for epoch in range(epochs):
             # Start Feed-Forward
             predictions = self.feed_forward()
