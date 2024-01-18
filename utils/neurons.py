@@ -53,9 +53,6 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         Returns:
             np.ndarray: The output of the neuron after applying the weights, bias, and activation function.
         """
-        if inputs:
-            self.inputs = inputs
-        # Simple linear/non-linear activation: weights * inputs + bias
 
         # delta = (np.dot(self.inputs, self.weights.T) + self.bias).T
 
