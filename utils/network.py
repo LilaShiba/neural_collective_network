@@ -12,9 +12,9 @@ class Network:
 
     def __init__(self, dataset: np.array):
         self.df = dataset
-        n = len(dataset)
-        self.input_layer = Layer(input=dataset, layer_size=n)
-        self.input_layer.create_neurons(group_size=1)
+        self.n = len(dataset)
+        self.input_layer = Layer(input=dataset, layer_size=self.n)
+        self.input_layer.create_neurons_list(group_size=1)
         self.layers = dict()
         self.layers[0] = self.input_layer
         self.delta_weights = [
@@ -25,11 +25,10 @@ class Network:
 
        # skiping layer 0 as that is the input layer
         for idx in range(layers):
-            n = len(self.delta_weights)
-            delta_layer = Layer(layer_size=n, input=self.df,
+            delta_layer = Layer(layer_size=self.n, input=self.df,
                                 weights=self.delta_weights)
             self.layers[idx] = delta_layer
-            self.delta_weights = delta_layer.create_neurons()
+            self.delta_weights = delta_layer.create_neurons_list()
         return self.layers
 
     def train_network(self, epochs: int = 100):
@@ -73,6 +72,7 @@ class Network:
         x_values = np.linspace(x_min, x_max, sample_size)
         # Compute the y values using a non-linear function (e.g., sine)
         y_values = np.sin(x_values)
+        np_array = np.array([x_values, y_values])
         # Combine x and y into a nested list of tuples
         dataset = np.array(list(zip(x_values, y_values)))
         if graph:

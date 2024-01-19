@@ -28,9 +28,7 @@ class Layer:
         2x3s
         '''
         n = len(self.input)
-        p_of_x = True  # TODO update to allow for neurons with diverse activations
-        if random_activation:
-            p_of_x = np.random.choice([0, 1])
+
         for i in range(n):
             # circular array
             delta_group = [self.input[(i + j) % n] for j in range(group_size)]
@@ -38,7 +36,7 @@ class Layer:
                 weight = self.weights[i-1]
 
             self.neurons[i] = Neuron(
-                inputs=delta_group, layer=self.layer, tanh=p_of_x, weights=weight)
+                inputs=delta_group, layer=self.layer, weights=weight)
 
     def feed_forward(self, data=False) -> np.array:
         '''
