@@ -1,4 +1,3 @@
-import random
 import numpy as np
 from typing import *
 import matplotlib.pyplot as plt
@@ -27,8 +26,7 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         self.last_input: np.array = self.inputs_x
         self.state: float = np.random.random(
             1)[0]  # np.random.lognormal(0, 1, 1)[0]
-        self.signal: float = np.random.random(
-            1)[0]  # np.random.lognormal(0, 1, 1)[0]
+        self.signal: np.array = np.random.rand(3)
 
     def compute_gradient(self, neuron_loss_grad: np.array):
         """
@@ -56,11 +54,11 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
 
         # delta = (np.dot(self.inputs, self.weights.T) + self.bias).T
 
-        self.delta = np.tanh(
-            np.dot(self.inputs_x, self.weights) + self.bias)
+        self.delta = np.tanh(self.signal
+                             * self.weights.T) + self.bias
         self.state, self.signal = self.delta[0], self.delta[1]
         self.last_input = self.signal
-        return self.signal
+        return self.delta
 
     def derivative(self):
         '''
@@ -82,7 +80,7 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         d_output_d_weights = res * self.inputs_y
         gradient = neuron_loss_grad * d_output_d_weights
 
-        self.weights -= (self.learning_rate * gradient)
+        self.weights -= (self.learning_rate * gradient).T
         self.loss_gradient = gradient
         return self.signal
 
@@ -90,7 +88,7 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         '''
         Update weights in backpropagation abstracted in Layer class
         '''
-        self.weights -= (self.learning_rate * neuron_weight_grad)
+        self.weights -= (self.learning_rate * neuron_weight_grad).T
         # TODO update bias during backpropagation
         # self.bias -= self.learning_rate * bias_gradient
 
@@ -113,4 +111,6 @@ if __name__ == "__main__":
 
     n2 = Neuron(inputs=[1, 2], layer=2, weights=neuron.weights)
     print(n2.feed_forward())
-    print(n2.weights)
+    # print(n2.weights)
+    print('')
+    print(n2.state)

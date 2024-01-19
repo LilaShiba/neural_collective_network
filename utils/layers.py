@@ -76,9 +76,11 @@ class Layer:
         if self.learning_rate is None:
             raise ValueError(
                 "Learning rate must be set before backpropagation.")
-
         for idx, neuron in enumerate(self.neurons.values()):
-            neuron.iterate()
+            neuron_loss_grad = self.loss_grad[idx]
+            neuron_weight_grad = neuron.compute_gradient(neuron_loss_grad)
+            # Update neuron weights
+            neuron.update_weights(neuron_weight_grad)
 
     def get_loss_vector(self, predictions: np.array, targets: np.array):
         '''
