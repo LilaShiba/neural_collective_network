@@ -56,7 +56,7 @@ class Vector:
         # Step 1: Generate Sample Data
         x = np.linspace(start, 2 * np.pi, points)  # 100 points from 0 to 2π
         y = np.sin(x) + np.random.normal(start, 0.2, points)
-        return np.array(list(zip(x, y)))
+        return (x, y)
 
 
 if __name__ == "__main__":

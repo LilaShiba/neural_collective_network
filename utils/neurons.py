@@ -5,17 +5,20 @@ from vectors import Vector
 
 
 class Neuron():
-    def __init__(self, inputs: np.array, layer: int, label: int = 0):
-        self.layer = layer
-        self.x = inputs[0]
-        self.y = inputs[1]
-        self.weights = np.random.rand(2, 3)  # 2x3 matrix of random floats
-        self.bias = np.random.random()
-        self.learning_rate = np.random.random()
-        self.state = np.random.random()
-        self.output = np.random.random()
-        self.loss_gradient = None
-        self.last_input = None
+    def __init__(self, inputs: np.array, layer: int, label: str = 'test'):
+        self.layer: int = layer
+        self.label: str = label
+        self.x: float = inputs[0]
+        self.y: float = inputs[1]
+        self.weights: np.array(np.array) = np.random.rand(
+            2, 3)  # 2x3 matrix of random floats
+        self.bias: float = np.random.random()
+        self.learning_rate: float = np.random.random()
+        self.state: float = np.random.random()
+        self.output: float = np.random.random()
+        self.loss_gradient: np.array = None
+        self.last_input: np.array = None
+        self.signal: np.array = None
 
     def compute_gradient(self, output):
         '''distance between predictions and ground truth'''
@@ -75,13 +78,14 @@ class Neuron():
 if __name__ == "__main__":
     # Example usage:
     print('begin test')
-    sine_wave = Vector.generate_nosiey_sin()
+    sine_wave = np.array(Vector.generate_nosiey_sin())
     one_point = np.array([sine_wave[0][0], sine_wave[1][0]])
     neuron = Neuron(inputs=one_point, layer=1)
     for x in range(100):
         neuron.iterate()
         if x % 10 == 0:
-            print(neuron.state, neuron.output)
+            print(
+                f" iteratrion:{x} state:{neuron.state} output:{neuron.output}")
             print('')
 
     # neuron.iterate()
@@ -92,3 +96,4 @@ if __name__ == "__main__":
     # # print(n2.weights)
     # print('')
     # print(n2.state)
+    print(f' prediction: {neuron.output} res: {neuron.y}')
