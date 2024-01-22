@@ -18,6 +18,7 @@ class Neuron():
         self.last_input = None
 
     def compute_gradient(self, output):
+        '''distance between predictions and ground truth'''
         error = output - self.y
         derivative = 1 - np.tanh(output) ** 2
         gradient = error * derivative * self.x
