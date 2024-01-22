@@ -74,8 +74,6 @@ class Layer:
         targets = self.input[-1]
         predictions = self.feed_forward()
 
-        print(predictions)
-
         mse_loss = self.get_loss_vector(predictions, targets)
         # Calculate the derivative of the loss with respect to the outputs
         # loss_grad = 2 * (predictions - targets) / len(targets)
@@ -87,8 +85,8 @@ class Layer:
         '''
         Activate neurons based on their inputs
         '''
-        outputs = [neuron.feed_forward(input_vector=data)
-                   for neuron in self.neurons.values()]
+        outputs = np.array([neuron.feed_forward(input_vector=data)
+                            for neuron in self.neurons.values()])
         return outputs
 
     def back_propagation(self):
@@ -121,7 +119,7 @@ class Layer:
 
     def train(self, epochs: int = 101):
         self.train_errors = []
-        targets = self.input[1]
+        targets = np.array([self.input[1]])
         for epoch in range(epochs):
             # Start Feed-Forward
             predictions = self.feed_forward()
@@ -129,7 +127,8 @@ class Layer:
             # Calculate loss
             mse_loss = self.get_loss_vector(predictions, targets)
             # Calculate the derivative of the loss with respect to the outputs
-            loss_grad = 2 * (predictions.T - targets) / len(targets)
+            loss_grad = 2 * (predictions - targets) / \
+                np.array(len(targets))
             self.loss_grad = loss_grad
             # Perform the backpropagation step
             self.back_propagation()
