@@ -1,4 +1,5 @@
-from utils.layers import Layer
+from layers import Layer
+from vectors import Vector
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -12,30 +13,28 @@ class Network:
 
     def __init__(self, dataset: np.array):
         self.df = dataset
-        self.n = len(dataset)
-        self.input_layer = Layer(input=dataset, layer_size=self.n)
-        self.input_layer.create_neurons_list(group_size=1)
+        self.n = len(dataset[0])
+        self.input_layer = Layer(data_points=dataset)
+        self.input_layer.create_neurons(number_of_neurons=self.n)
         self.layers = dict()
         self.layers[0] = self.input_layer
-        self.delta_weights = [
-            n.weights for n in self.input_layer.neurons.values()]
 
     def init_network(self, layers: int = 5):
         '''train all layers in network save for input'''
 
        # skiping layer 0 as that is the input layer
         for idx in range(layers):
-            delta_layer = Layer(layer_size=self.n, input=self.df,
-                                weights=self.delta_weights)
+            delta_layer = Layer(data_points=self.df,
+                                layer_number=idx, name="hidden_layer")
+            delta_layer.create_neurons(number_of_neurons=self.n)
             self.layers[idx] = delta_layer
-            self.delta_weights = delta_layer.create_neurons_list()
         return self.layers
 
-    def train_network(self, epochs: int = 100):
+    def train_network(self, epochs: int = 2):
         '''updates all neurons in place'''
         for idx in range(epochs):
             for layer in self.layers.values():
-                layer.iterate()
+                layer.train()
 
     def predict(self, test_params: list()) -> np.array:
         '''
@@ -102,3 +101,12 @@ class Network:
         plt.imshow(image_array, cmap='gray')
         plt.axis('off')  # Turn off axis numbers
         plt.show()
+
+
+if __name__ == "__main__":
+    sine_wave = np.array(Vector.generate_nosiey_sin())
+    network_example = Network(dataset=sine_wave)
+    network_example.init_network(layers=3)
+    network_example.train_network(epochs=2)
+    print(
+        f' Prediction: {network_example.layers[0].neurons[0].output} | Ground Truth: {network_example.layers[0].neurons[0].y}')
