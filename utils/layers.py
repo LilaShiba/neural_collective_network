@@ -1,153 +1,60 @@
-import random
 import numpy as np
 from typing import *
-from utils.neurons import Neuron
 import matplotlib.pyplot as plt
+from neurons import Neuron
+from vectors import Vector
 
 
 class Layer:
-    '''
-    Class representing the temporal steps & connections between complex neurons
+    '''Linear applications of vectors consisting of complex neurons'''
 
-    '''
+    def __init__(self, data_points: np.array, layer_number: int = 0, name: str = "Input_Layer", number_of_neurons: int = None, weights: np.array = None):
 
-    def __init__(self, layer_size: int, input=np.array(np.array), weights: np.array(np.array) = [], layer_num: int = 0) -> None:
-        self.input = input
-        self.layer: int = layer_num
-        self.layer_size: int = layer_size
-        self.neurons: dict = dict()
-        self.loss_grad: np.array = None
-        self.learning_rate = np.random.random(1)[0]
-        self.weights = []
-        if len(weights) > 0:
-            self.weights = weights
+        self.x: np.array = data_points[0]
+        self.n: int = len(self.x)
+        self.y: np.array = data_points[1]
+        self.m: int = len(self.y)
+        self.db: np.array(np.array) = data_points
+        self.name: str = name
+        self.state: np.array = None
+        self.output: np.array(np.array) = None
+        self.signal: np.array(np.array) = None
 
-    def create_neurons(self, group_size: int = 2):
+        self.neurons: np.array = None
+        self.layer_number: int = layer_number
+        self.number_of_neurons: int = number_of_neurons
+        self.inputs: np.array = None  # vectorized neuron input
+        self.weights: np.array = weights  # vectorized neuron weights
+
+    def create_neurons(self, number_of_neurons: int):
         '''
-        Initialzes neurons in circular fashion
-        2x3s
-        Returns: List of neuron weights
-        '''
-        n = len(self.input)
-        m = len(self.weights)
-        for i in range(self.layer_size):
-            # circular array
-            delta_group = [self.input[(i + j) % n] for j in range(group_size)]
-            delta_weights = []
-            # if len(self.weights) > 0:
-            #     delta_weights = [self.weights[i: (i + j) % m]
-            #                      for j in range(group_size)]
-            # if len(delta_weights) > 0:
-            #     print(f'delta weights {delta_weights}')
-            self.neurons[i] = Neuron(
-                inputs=delta_group, layer=self.layer, weights=delta_weights)
-        return [n.weights for n in self.neurons.values()]
+        creates self.neurons: np.array of neurons based on datapoints
+        creates self.weights: np.array of 2x3 weights based on neurons
 
-    def iterate(self):
-        '''one training cycle for a layer'''
-        targets = np.array([sample[1] for sample in self.input])
-        predictions = self.feed_forward()
-        mse_loss = self.get_loss_vector(predictions, targets)
-        # Calculate the derivative of the loss with respect to the outputs
-        loss_grad = 2 * (predictions - targets) / len(targets)
-        self.loss_grad = loss_grad
-        # Perform the backpropagation step
-        self.back_propagation()
-
-    def feed_forward(self, data=False) -> np.array:
-        '''
-        Activate neurons based on their inputs
-        '''
-        outputs = [neuron.feed_forward(inputs=data)
-                   for neuron in self.neurons.values()]
-        return outputs
-
-    def back_propagation(self):
-        '''
-        Backpropagate the error and update the weights of each neuron.
-        '''
-        # Ensure that the necessary attributes are set
-        if self.loss_grad is None:
-            raise ValueError(
-                "Loss gradient must be set before backpropagation.")
-        if self.learning_rate is None:
-            raise ValueError(
-                "Learning rate must be set before backpropagation.")
-
-        input_grad = np.zeros_like(self.input)
-
-        for idx, neuron in enumerate(self.neurons.values()):
-            neuron.iterate()
-
-    def get_loss_vector(self, predictions: np.array, targets: np.array):
-        '''
-        # For Mean Squared Error (MSE):
-        # Loss = (1/N) * sum((y_i - y_hat_i)^2) for i = 1 to N
-
-        # For Cross-Entropy:
-        # Loss = -sum(y_i * log(y_hat_i)) for i = 1 to N
 
         '''
-        return np.mean((predictions - targets)**2)
+        self.neurons = np.array([Neuron([self.x[idx], self.y[idx]], layer=1, label=self.name)
+                                 for idx in range(number_of_neurons)])
+        self.weights = np.array([neuron.weights for neuron in self.neurons])
+        self.inputs = np.array([[neuron.x, neuron.state, 1]
+                               for neuron in self.neurons])
+        return self.inputs, self.weights
 
-    def train(self, epochs: int = 101):
-        self.train_errors = []
-        targets = np.array([sample[1] for sample in self.input])
-        for epoch in range(epochs):
-            # Start Feed-Forward
-            predictions = self.feed_forward()
-
-            # Calculate loss
-            mse_loss = self.get_loss_vector(predictions, targets)
-            # Calculate the derivative of the loss with respect to the outputs
-            loss_grad = 2 * (predictions - targets) / len(targets)
-            self.loss_grad = loss_grad
-            # Perform the backpropagation step
-            self.back_propagation()
-            # (Optional) Print the loss to monitor progress
-            if epoch % 10 == 0:  # Print every 10 epochs, adjust as needed
-                print(f"Epoch {epoch}, Loss: {mse_loss}")
-                self.train_errors.append(mse_loss)
-
-    def see_loss_grad(self):
+    def feed_forward(self):
         '''
-        Graph of loss gradient
+        vectorized feed forward operation of neruons
         '''
-        if len(self.loss_grad) > 0:
-            plt.plot(self.train_errors)
-            plt.title('Loss Gradient')
-            plt.show()
-            plt.close()
-
-    def pass_data(self, div: int = 1):
-        ''' Subprocess 2
-                prepares weights for layer transfer
-            returns np.array([weights, input])
-        '''
-        self.weights = [n.weights for n in self.neurons.values()]
-        # Pair up the elements from the two lists
-        paired_data = list(zip(self.weights, self.input))
-        # Randomly select half of the pairs
-        n = len(paired_data)
-        selected_pairs = random.sample(paired_data, n//div)
-        # Separate the pairs back into two lists
-        half_weights, input_half = zip(*selected_pairs)
-        return half_weights, input_half
+        self.signal = np.tanh(
+            (self.inputs * self.weights))  # + self.bias
+        self.state, self.output = self.signal[0], self.signal[1]
+        self.last_input = self.signal
+        return [self.state, self.output]
 
 
 if __name__ == "__main__":
-    num_points = 100
-    test_size = 0.3
-    random_state = 42  # For reproducibility
+    sine_wave = np.array(Vector.generate_nosiey_sin())
 
-    # Generate dataset
-    x = np.linspace(1, 2*np.pi, num_points)
-    y = np.sin(x)
-    non_lin_test = np.array(list(zip(x, y)))
-    input_layer = Layer(layer_size=128, input=non_lin_test)
-    input_layer.create_neurons(group_size=3)
-    weights_input = weights = input_layer.pass_data(2)[0]
-    hidden_layer_one = Layer(
-        layer_size=64, input=non_lin_test, weights=weights_input)
-    hidden_layer_one.create_neurons(3)
-    print(hidden_layer_one.neurons.values())
+    layer_input = Layer(sine_wave)
+    inputs, weights = layer_input.create_neurons(len(sine_wave))
+    state, output = layer_input.feed_forward()
+    print(state)

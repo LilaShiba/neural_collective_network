@@ -1,49 +1,33 @@
-import random
 import numpy as np
 from typing import *
 import matplotlib.pyplot as plt
+from vectors import Vector
 
 
-class Neuron:
-    """A class representing a complex single neuron in a neural network.
-s (Dict[str, float]): A dictionary for storing various performance metrics.
-    """
-
-    def __init__(self, inputs: np.array(np.array), layer: int, weights: np.array = []) -> None:
-        """Initialize the Neuron with random weights, bias, and specified dimensions and layer.
-
-        Args:
-            layer (int): The layer number the neuron is part of.
-        """
-        self.weights = weights if len(weights) > 0 else np.random.rand(3, 2)
-        self.learning_rate: float = random.uniform(0.1, 1)
-        self.inputs = np.array(inputs)
-        self.inputs_x = self.inputs[0][0]
-        self.inputs_y = self.inputs[-1][0]
-        self.bias = np.random.random(1)[0]  # random.uniform(0.1, 0.5)
-        self.edges = list()
+class Neuron():
+    def __init__(self, inputs: np.array, layer: int, label: str = 'test'):
         self.layer: int = layer
-        self.delta: np.array = None  # activation function output
+        self.label: str = label
+        self.x: float = inputs[0]
+        self.y: float = inputs[1]
+        self.weights: np.array(np.array) = np.random.rand(
+            2, 3)  # 2x3 matrix of random floats
+        self.bias: float = np.random.random()
+        self.learning_rate: float = np.random.random()
+        self.state: float = np.random.random()
+        self.output: float = np.random.random()
         self.loss_gradient: np.array = None
-        self.last_input: np.array = self.inputs
-        self.state = np.random.lognormal(0, 1, 1)[0]
-        self.signal: float = np.random.lognormal(0, 1, 1)[0]
+        self.last_input: np.array = None
+        self.signal: np.array = None
 
-    def compute_gradient(self, neuron_loss_grad: np.array):
-        """
-        Compute the gradient of the neuron's weights with respect to the loss.
+    def compute_gradient(self, output):
+        '''distance between predictions and ground truth'''
+        error = output - self.y
+        derivative = 1 - np.tanh(output) ** 2
+        gradient = error * derivative * self.x
+        return gradient, error
 
-        :param neuron_loss_grad: The gradient of the loss with respect to the neuron's output.
-        :return: The gradient with respect to the neuron's weights.
-        """
-        res = self.derivative()
-        # res = res[:-1, :]
-        d_output_d_weights = res * self.last_input.T
-        gradient = neuron_loss_grad * d_output_d_weights
-        self.loss_gradient = gradient
-        return gradient
-
-    def feed_forward(self, inputs=False) -> np.ndarray:
+    def feed_forward(self, input_vector=None) -> np.ndarray:
         """Compute the neuron's output using a simple linear activation.
 
         Args:
@@ -53,22 +37,19 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         Returns:
             np.ndarray: The output of the neuron after applying the weights, bias, and activation function.
         """
-        if inputs:
-            self.inputs = inputs
-        # Simple linear/non-linear activation: weights * inputs + bias
-        self.last_input = self.inputs
+        if input_vector is None:
+            input_vector = [self.x, self.state, 1]
         # delta = (np.dot(self.inputs, self.weights.T) + self.bias).T
-
-        self.delta = np.tanh(
-            np.dot([self.inputs_x, self.state, 1], self.weights) + self.bias)
-        self.state, self.signal = self.delta[0], self.delta[1]
-        return self.signal
+        self.signal = np.tanh(np.dot(input_vector, self.weights.T)) + self.bias
+        self.state, self.output = self.signal[0], self.signal[1]
+        self.last_input = self.signal
+        return [self.state, self.output]
 
     def derivative(self):
         '''
         returns the derivative of the activation function
         '''
-        return (1.0 - np.tanh(self.delta) ** 2)
+        return (1.0 - np.tanh(self.signal) ** 2)
         # return self.sigmoid(self.delta) * (1-self.sigmoid(self.delta))
 
     def iterate(self):
@@ -78,23 +59,10 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
         :param neuron_loss_grad: The gradient of the loss with respect to the neuron's output.
         :return: The neuron signal after 1 iteration.
         """
-        delta_signal = self.feed_forward()
-        res = self.derivative()
-        neuron_loss_grad = (delta_signal - self.inputs_y)
-        d_output_d_weights = res * self.inputs_y.T
-        gradient = neuron_loss_grad * d_output_d_weights
-
+        predictions = self.feed_forward()
+        gradient, error = self.compute_gradient(predictions[1])
         self.weights -= self.learning_rate * gradient
-        self.loss_gradient = gradient
-        return self.signal
-
-    def update_weights(self, neuron_weight_grad):
-        '''
-        Update weights in backpropagation abstracted in Layer class
-        '''
-        self.weights -= (self.learning_rate * neuron_weight_grad)
-        # TODO update bias during backpropagation
-        # self.bias -= self.learning_rate * bias_gradient
+        self.bias -= self.learning_rate * error
 
     @staticmethod
     def sigmoid(x):
@@ -109,10 +77,23 @@ s (Dict[str, float]): A dictionary for storing various performance metrics.
 
 if __name__ == "__main__":
     # Example usage:
-    neuron = Neuron(inputs=np.array([1, 2 * np.pi]), layer=1)
-    print(neuron.iterate())
-    print(neuron.weights)
+    print('begin test')
+    sine_wave = np.array(Vector.generate_nosiey_sin())
+    one_point = np.array([sine_wave[0][0], sine_wave[1][0]])
+    neuron = Neuron(inputs=one_point, layer=1)
+    for x in range(100):
+        neuron.iterate()
+        if x % 10 == 0:
+            print(
+                f" iteratrion:{x} state:{neuron.state} output:{neuron.output}")
+            print('')
 
-    n2 = Neuron(inputs=[1, 2], layer=2, weights=neuron.weights)
-    print(n2.feed_forward())
-    print(n2.weights)
+    # neuron.iterate()
+    # print(neuron.weights)
+
+    # n2 = Neuron(inputs=[1, 2], layer=2, weights=neuron.weights)
+    # print(n2.feed_forward())
+    # # print(n2.weights)
+    # print('')
+    # print(n2.state)
+    print(f' prediction: {neuron.output} res: {neuron.y}')
