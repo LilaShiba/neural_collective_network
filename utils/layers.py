@@ -6,16 +6,20 @@ from vectors import Vector
 
 
 class Layer:
-    '''Linear applications of vectors consisting of nodes'''
+    '''Linear applications of vectors consisting of complex neurons'''
 
     def __init__(self, data_points: np.array, layer_number: int = 0, name: str = "Input_Layer", number_of_neurons: int = None, weights: np.array = None):
 
         self.x: np.array = data_points[0]
         self.n: int = len(self.x)
-        self.y: np.array = data_points
+        self.y: np.array = data_points[1]
         self.m: int = len(self.y)
         self.db: np.array(np.array) = data_points
         self.name: str = name
+        self.state: np.array = None
+        self.output: np.array(np.array) = None
+        self.signal: np.array(np.array) = None
+
         self.neurons: np.array = None
         self.layer_number: int = layer_number
         self.number_of_neurons: int = number_of_neurons
