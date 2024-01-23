@@ -49,13 +49,13 @@ class Layer:
         self.state, self.output = self.signal[0], self.signal[1]
         return [self.state, self.output]
 
-    def train(self, epochs: int = 10):
+    def train(self, epochs: int = 1):
         '''
         vectorized back_propagation using tanh
         '''
         vectorized_iterate = np.vectorize(lambda neuron: neuron.iterate())
 
-        for x in range(epochs):
+        for _ in range(epochs):
             self.neurons = vectorized_iterate(self.neurons)
         return self.neurons
 
@@ -69,4 +69,4 @@ if __name__ == "__main__":
     # print(layer_input.neurons[0].weights)
     vect_neurons = layer_input.train(epochs=12)
     print(
-        f' prediction: {vect_neurons[0].output} ground truth: {vect_neurons[0].y}')
+        f' prediction: {vect_neurons[0].output} | ground truth: {vect_neurons[0].y}')
