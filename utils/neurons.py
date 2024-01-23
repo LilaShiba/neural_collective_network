@@ -63,6 +63,7 @@ class Neuron():
         gradient, error = self.compute_gradient(predictions[1])
         self.weights -= self.learning_rate * gradient
         self.bias -= self.learning_rate * error
+        return self
 
     @staticmethod
     def sigmoid(x):
