@@ -56,8 +56,8 @@ class Layer:
         vectorized_iterate = np.vectorize(lambda neuron: neuron.iterate())
 
         for x in range(epochs):
-            vectorized_neurons = vectorized_iterate(self.neurons)
-        return vectorized_neurons
+            self.neurons = vectorized_iterate(self.neurons)
+        return self.neurons
 
 
 if __name__ == "__main__":
@@ -67,5 +67,6 @@ if __name__ == "__main__":
     inputs, weights = layer_input.create_neurons(len(sine_wave[0]))
     # state, output = layer_input.feed_forward()
     # print(layer_input.neurons[0].weights)
-    vect_neurons = layer_input.train(epochs=2)
-    print(vect_neurons)
+    vect_neurons = layer_input.train(epochs=12)
+    print(
+        f' prediction: {vect_neurons[0].output} ground truth: {vect_neurons[0].y}')
