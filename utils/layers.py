@@ -47,14 +47,25 @@ class Layer:
         self.signal = np.tanh(
             (self.inputs * self.weights))  # + self.bias
         self.state, self.output = self.signal[0], self.signal[1]
-        self.last_input = self.signal
         return [self.state, self.output]
+
+    def train(self, epochs: int = 10):
+        '''
+        vectorized back_propagation using tanh
+        '''
+        vectorized_iterate = np.vectorize(lambda neuron: neuron.iterate())
+
+        for x in range(epochs):
+            vectorized_neurons = vectorized_iterate(self.neurons)
+        return vectorized_neurons
 
 
 if __name__ == "__main__":
     sine_wave = np.array(Vector.generate_nosiey_sin())
 
     layer_input = Layer(sine_wave)
-    inputs, weights = layer_input.create_neurons(len(sine_wave))
-    state, output = layer_input.feed_forward()
-    print(state)
+    inputs, weights = layer_input.create_neurons(len(sine_wave[0]))
+    # state, output = layer_input.feed_forward()
+    # print(layer_input.neurons[0].weights)
+    vect_neurons = layer_input.train(epochs=2)
+    print(vect_neurons)
