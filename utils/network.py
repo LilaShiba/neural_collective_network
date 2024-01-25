@@ -1,9 +1,10 @@
-from layers import Layer
-from vectors import Vector
+from utils.layers import Layer
+from utils.vectors import Vector
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from typing import *
+import heapq
 
 
 class Network:
@@ -18,14 +19,16 @@ class Network:
         self.input_layer.create_neurons(number_of_neurons=self.n)
         self.layers = dict()
         self.layers[0] = self.input_layer
+        self.edges_between_layers: dict = DefaultDict()
 
-    def init_network(self, layers: int = 5):
+    def init_network(self, layers: int = 5, sizes: list = None):
         '''train all layers in network save for input'''
-
+        if sizes is None:
+            sizes = [self.n] * layers
        # skiping layer 0 as that is the input layer
         for idx in range(layers):
             delta_layer = Layer(data_points=self.df,
-                                layer_number=idx, name="hidden_layer")
+                                layer_number=idx, name="hidden_layer", number_of_neurons=sizes[idx])
             delta_layer.create_neurons(number_of_neurons=self.n)
             self.layers[idx] = delta_layer
         return self.layers
@@ -53,7 +56,7 @@ class Network:
                 res.append(np.mean(predictions))
         return res
 
-    def update_edges(self):
+    def update_edges(self, scale: str = ''):
         pass
 
     @staticmethod
@@ -106,7 +109,7 @@ class Network:
 if __name__ == "__main__":
     sine_wave = np.array(Vector.generate_nosiey_sin())
     network_example = Network(dataset=sine_wave)
-    network_example.init_network(layers=3)
-    network_example.train_network(epochs=2)
+    network_example.init_network(layers=3, sizes=[100, 50, 100])
+    network_example.train_network(epochs=3)
     print(
         f' Prediction: {network_example.layers[0].neurons[0].output} | Ground Truth: {network_example.layers[0].neurons[0].y}')

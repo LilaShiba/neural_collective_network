@@ -1,11 +1,12 @@
 import numpy as np
 from typing import *
 import matplotlib.pyplot as plt
-from vectors import Vector
+from utils.vectors import Vector
 
 
 class Neuron():
-    def __init__(self, inputs: np.array, layer: int, label: str = 'test'):
+    def __init__(self, id: int, inputs: np.array, layer: int, label: str = 'test'):
+        self.id: int = id
         self.layer: int = layer
         self.label: str = label
         self.x: float = inputs[0]
@@ -81,7 +82,7 @@ if __name__ == "__main__":
     print('begin test')
     sine_wave = np.array(Vector.generate_nosiey_sin())
     one_point = np.array([sine_wave[0][0], sine_wave[1][0]])
-    neuron = Neuron(inputs=one_point, layer=1)
+    neuron = Neuron(id=1, inputs=one_point, layer=1)
     for x in range(100):
         neuron.iterate()
         if x % 10 == 0:

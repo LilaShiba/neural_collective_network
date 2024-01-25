@@ -1,8 +1,9 @@
 import numpy as np
 from typing import *
 import matplotlib.pyplot as plt
-from neurons import Neuron
-from vectors import Vector
+from utils.neurons import Neuron
+from utils.vectors import Vector
+import heapq
 
 
 class Layer:
@@ -25,6 +26,7 @@ class Layer:
         self.number_of_neurons: int = number_of_neurons
         self.inputs: np.array = None  # vectorized neuron input
         self.weights: np.array = weights  # vectorized neuron weights
+        self.states: list = []  # heapq of (state, id)
 
     def create_neurons(self, number_of_neurons: int):
         '''
@@ -33,12 +35,24 @@ class Layer:
 
 
         '''
-        self.neurons = np.array([Neuron([self.x[idx], self.y[idx]], layer=1, label=self.name)
+        self.neurons = np.array([Neuron(id=idx, inputs=[self.x[idx], self.y[idx]], layer=1, label=self.name)
                                  for idx in range(number_of_neurons)])
         self.weights = np.array([neuron.weights for neuron in self.neurons])
         self.inputs = np.array([[neuron.x, neuron.state, 1]
                                for neuron in self.neurons])
+        delta_states = [heapq.heappush(
+            self.states, (neuron.state, neuron.id)) for neuron in self.neurons]
+        self.states = delta_states
         return self.inputs, self.weights
+
+    def update_states_list(self) -> list:
+        '''
+        update the heapq for edgesd
+        '''
+        self.states = [heapq.heappush(
+            self.states, (neuron.state, neuron.id)) for neuron in self.neurons]
+
+        return self.states
 
     def feed_forward(self):
         '''
@@ -53,10 +67,16 @@ class Layer:
         '''
         vectorized back_propagation using tanh
         '''
-        vectorized_iterate = np.vectorize(lambda neuron: neuron.iterate())
+        # result = matrix_2x3x100 * matrix_2x3[:,:,np.newaxis]
 
+        vectorized_iterate = np.vectorize(lambda neuron: neuron.iterate())
+        heap = []
         for _ in range(epochs):
             self.neurons = vectorized_iterate(self.neurons)
+            # TODO: Vectorize edges
+            _ = [heapq.heappush(heap, (neuron.state, neuron))
+                 for neuron in self.neurons]
+            self.states = heap
         return self.neurons
 
 
