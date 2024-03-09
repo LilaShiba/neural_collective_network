@@ -1,5 +1,5 @@
-from layers import Layer
-from vectors import Vector
+from utils.layers import Layer
+from utils.vectors import Vector
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image

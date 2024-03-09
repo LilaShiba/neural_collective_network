@@ -1,7 +1,7 @@
 import numpy as np
 from typing import *
 import matplotlib.pyplot as plt
-from vectors import Vector
+from utils.vectors import Vector
 
 
 class Neuron():

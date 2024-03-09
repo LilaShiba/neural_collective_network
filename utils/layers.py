@@ -1,8 +1,8 @@
 import numpy as np
 from typing import *
 import matplotlib.pyplot as plt
-from neurons import Neuron
-from vectors import Vector
+from utils.neurons import Neuron
+from utils.vectors import Vector
 
 
 class Layer:
