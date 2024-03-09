@@ -48,17 +48,15 @@ if __name__ == "__main__":
     plt.show()
 
     # Split dataset into training and test sets
-    # x_train, x_test, y_train, y_test = train_test_split(
-    #     x, y, test_size=test_size, random_state=random_state)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=random_state)
 
     training_data = np.array(list(zip(x, y)))
     # Create Sine wave for testing
-    # non_linearity_test = sine_wave()
-    # plt.plot(non_linearity_test[:, -1])
-    # plt.title('Input')
-    # plt.show()
+    non_linearity_test = sine_wave()
+    plt.plot(non_linearity_test[:, -1])
+    plt.title('Input')
+    plt.show()
     example_network = Network(dataset=training_data)
     example_network.init_network(layers=2)
     print(example_network.layers.values())
-    # TODO fix predict function
-    # res = example_network.predict(test_params=x_test)
+    example_network.predict(test_params=x_test)

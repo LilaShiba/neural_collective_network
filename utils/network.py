@@ -45,10 +45,9 @@ class Network:
         for dp_id, data in enumerate(test_params):
             # print(f'id {dp_id} datapoint {data}')
             for idx, current_layer in enumerate(self.layers.values()):
-                predictions = current_layer.feed_forward(data)
-                # print(f'layer {idx}')
-                # print(' mu:', np.mean(predictions),
-                #       'sigma:', np.std(predictions)
+                predictions = current_layer.feed_forward()
+                print(f'layer {idx}')
+                print(f'mu:{np.mean(predictions)} sigma: { np.std(predictions)}')
 
                 res.append(np.mean(predictions))
         return res
