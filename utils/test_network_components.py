@@ -6,6 +6,7 @@ import unittest
 import numpy as np
 import sys
 import os
+np.set_printoptions(precision=3, suppress=True)
 
 
 class TestNeuron(unittest.TestCase):
@@ -35,14 +36,22 @@ class TestLayer(unittest.TestCase):
 
     def test_create_neurons(self):
         inputs, weights = self.layer.create_neurons(2)
-        print(f"Layer create_neurons inputs: {inputs}, weights: {weights}")
+        print("")
+        print(f"Layer create_neurons inputs")
+        print(inputs)
+        print("")
+        print("weights:")
+        print(weights)
         self.assertEqual(len(inputs), 2)
         self.assertEqual(len(weights), 2)
 
     def test_feed_forward(self):
         self.layer.create_neurons(2)
         state, output = self.layer.feed_forward()
-        print(f"Layer feed_forward state: {state}, output: {output}")
+        print("Layer feed_forward state:")
+        print(state)
+        print('Layer Output:')
+        print(output)
         self.assertIsNotNone(state)
         self.assertIsNotNone(output)
 
@@ -70,12 +79,16 @@ class TestNetwork(unittest.TestCase):
         self.network.train_network(epochs=2)
         test_params = [0.5, 0.8]
         predictions = self.network.predict(test_params=test_params)
-        print(
-            f"Network predict test_params: {test_params}, predictions: {predictions}")
+        # print("")
+        # print(
+        #     f"Network predict test_params: {test_params}, predictions: {predictions}")
+        # print('')
         expected_predictions_length = len(
             test_params) * len(self.network.layers)
         self.assertEqual(len(predictions), expected_predictions_length)
 
 
 if __name__ == '__main__':
+    np.set_printoptions(precision=3, suppress=True)
+
     unittest.main()

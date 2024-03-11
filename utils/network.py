@@ -102,6 +102,8 @@ class Network:
 
 
 if __name__ == "__main__":
+    np.set_printoptions(precision=3, suppress=True)
+
     sine_wave = np.array(Vector.generate_noisy_sin())
     network_example = Network(dataset=sine_wave)
     network_example.init_network(layers=3)

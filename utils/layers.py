@@ -57,6 +57,8 @@ class Layer:
 
 
 if __name__ == "__main__":
+    np.set_printoptions(precision=3, suppress=True)
+
     sine_wave = Vector.generate_noisy_sin()
     x, y = sine_wave[:, 0].tolist(), sine_wave[:, 1].tolist()
     layer_input = Layer([x, y])
