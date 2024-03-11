@@ -7,10 +7,6 @@ import numpy as np
 import sys
 import os
 
-# Adjust the path to include the directory above 'unit_tests' to access 'utils'
-sys.path.append(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), '..', 'utils')))
-
 
 class TestNeuron(unittest.TestCase):
     def setUp(self):
@@ -26,12 +22,15 @@ class TestNeuron(unittest.TestCase):
 
     def test_feed_forward(self):
         output = self.neuron.feed_forward()
+        print(f"Neuron feed_forward input: {self.inputs}, output: {output}")
         self.assertIsInstance(output, list)
         self.assertEqual(len(output), 2)
 
     def test_iterate(self):
         initial_output = self.neuron.output
         self.neuron.iterate()
+        print(
+            f"Neuron iterate initial output: {initial_output}, new output: {self.neuron.output}")
         self.assertNotEqual(initial_output, self.neuron.output)
 
 
@@ -42,13 +41,14 @@ class TestLayer(unittest.TestCase):
 
     def test_create_neurons(self):
         inputs, weights = self.layer.create_neurons(2)
-        # Expecting the number of neurons (and thus inputs and weights) to match the smaller number due to data size
+        print(f"Layer create_neurons inputs: {inputs}, weights: {weights}")
         self.assertEqual(len(inputs), 2)
         self.assertEqual(len(weights), 2)
 
     def test_feed_forward(self):
         self.layer.create_neurons(2)
         state, output = self.layer.feed_forward()
+        print(f"Layer feed_forward state: {state}, output: {output}")
         self.assertIsNotNone(state)
         self.assertIsNotNone(output)
 
@@ -60,13 +60,15 @@ class TestNetwork(unittest.TestCase):
 
     def test_init_network(self):
         self.network.init_network(layers=3)
-        # Expect 4 layers in total: 1 input layer + 3 hidden layers
+        print(f"Network init_network layers: {len(self.network.layers)}")
         self.assertEqual(len(self.network.layers), 4)
 
     def test_train_network(self):
         self.network.init_network(layers=3)
         initial_output = self.network.layers[0].neurons[0].output
         self.network.train_network(epochs=1)
+        print(
+            f"Network train_network initial output: {initial_output}, new output: {self.network.layers[0].neurons[0].output}")
         self.assertNotEqual(
             initial_output, self.network.layers[0].neurons[0].output)
 
@@ -75,8 +77,8 @@ class TestNetwork(unittest.TestCase):
         self.network.train_network(epochs=1)
         test_params = [0.5, -0.5]
         predictions = self.network.predict(test_params=test_params)
-        # Adjusting the expectation based on the actual implementation details of your predict method
-        # Assuming each layer contributes to the prediction, adjust the expected length accordingly
+        print(
+            f"Network predict test_params: {test_params}, predictions: {predictions}")
         expected_predictions_length = len(
             test_params) * len(self.network.layers)
         self.assertEqual(len(predictions), expected_predictions_length)
