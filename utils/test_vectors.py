@@ -1,6 +1,6 @@
+import matplotlib.pyplot as plt
 import unittest
 import numpy as np
-# Make sure to replace 'your_vector_class_file' with the actual file name where your Vector class is defined.
 from vectors import Vector
 
 
@@ -62,5 +62,49 @@ class TestVector(unittest.TestCase):
         self.assertGreaterEqual(ent, 0)
 
 
+def main():
+    # Generate a noisy sine wave
+    sine_wave_data = Vector.generate_noisy_sin()
+    vector = Vector(data_points=sine_wave_data)
+
+    # Plot the Probability Density Function (PDF)
+    print("Plotting PDF...")
+    vector.plot_pdf()
+
+    # Plot basic statistics: mean and standard deviation
+    print("Plotting basic statistics...")
+    vector.plot_basic_stats()
+
+    # Calculate and print rolling average with a window size of 5
+    rolling_avg = vector.rolling_average(window_size=5)
+    print("Rolling average (first 10 values):", rolling_avg[:10])
+
+    # Get and print probability vector for x-axis
+    prob_vector_x = vector.get_prob_vector(axis=0, rounding=2)
+    print("Probability vector for x-axis (first 5):",
+          dict(list(prob_vector_x.items())[:5]))
+
+    # If y-axis exists, get and print probability vector for y-axis
+    if vector.y is not None:
+        prob_vector_y = vector.get_prob_vector(axis=1, rounding=2)
+        print("Probability vector for y-axis (first 5):",
+              dict(list(prob_vector_y.items())[:5]))
+
+    # Demonstrate set operations using two vectors
+    sine_wave_data_2 = Vector.generate_noisy_sin()
+    vector2 = Vector(data_points=sine_wave_data_2)
+    union, intersection, jaccard_index = Vector.set_operations(vector, vector2)
+    print(f"Union (sample): {list(union)[:5]}")
+    print(f"Intersection (sample): {list(intersection)[:5]}")
+    print(f"Jaccard Index: {jaccard_index}")
+
+    # Calculate entropy between two probability distributions (example)
+    prob_dist1 = np.array(list(prob_vector_x.values()))
+    prob_dist2 = np.array(list(prob_vector_y.values()))
+    entropy = Vector.calculate_aligned_entropy(vector, vector2)
+    print(f"Entropy between two probability distributions: {entropy}")
+
+
 if __name__ == '__main__':
-    unittest.main()
+    # Sunittest.main()
+    main()

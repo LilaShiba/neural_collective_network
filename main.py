@@ -59,4 +59,4 @@ if __name__ == "__main__":
     example_network = Network(dataset=training_data)
     example_network.init_network(layers=2)
     print(example_network.layers.values())
-    example_network.predict(test_params=x_test)
+    print(example_network.predict(test_params=x_test))

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Tuple, Dict, Set
+from typing import *
 
 
 class Vector:
@@ -83,14 +83,26 @@ class Vector:
         return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
 
     @staticmethod
-    def calculate_entropy(prob_dist1: np.array, prob_dist2: np.array) -> float:
-        '''Calculates the entropy between two probability distributions.'''
+    def calculate_aligned_entropy(vector1, vector2) -> float:
+        """
+        Calculates the entropy between two aligned probability distributions from Vector instances.
+        """
+
+        # Combine and find unique values across both vectors
+        all_values = np.unique(np.concatenate(
+            (vector1.x, vector2.y)))
+
+        # Create probability distributions with zeros for missing values in each vector
+        prob_dist1 = list(vector1.get_prob_vector().values())
+        prob_dist2 = list(vector2.get_prob_vector().values())
+
         # Ensure the probability distributions are normalized
         prob_dist1 = prob_dist1 / np.sum(prob_dist1)
         prob_dist2 = prob_dist2 / np.sum(prob_dist2)
 
         # Calculate the entropy
-        return -np.sum(prob_dist1 * np.log(prob_dist2 / prob_dist1))
+        entropy = -np.sum(prob_dist1 * np.log(prob_dist2))
+        return entropy
 
     @staticmethod
     def set_operations(v1: 'Vector', v2: 'Vector') -> Tuple[Set[float], Set[float], float]:
