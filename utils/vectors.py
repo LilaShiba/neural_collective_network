@@ -1,11 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import *
-from collections import defaultdict
+from typing import Tuple, Dict, Set
 
 
 class Vector:
-    ''' Vector Maths Class'''
+    '''Vector Maths Class for statistical analysis and visualization.'''
 
     def __init__(self, label: int = 0, data_points: np.array = None):
         self.label = label
@@ -13,53 +12,101 @@ class Vector:
             self.v = data_points
             self.n = len(data_points)
             self.x = data_points[:, 0]
-            if data_points.ndim == 2:
-                self.y = data_points[:-1]
+            if data_points.ndim == 2 and data_points.shape[1] > 1:
+                self.y = data_points[:, 1]
+            else:
+                self.y = None
 
-    def count(self, array: np.array, value: float):
-        '''returns count of value in an array'''
+    def count(self, array: np.array, value: float) -> int:
+        '''Returns count of value in an array.'''
         return len(array[array == value])
 
-    def get_prob_vectors(self, rounding=None):
-        '''run get_prob_vector for all axis'''
-        return self.get_prob_vector(0, rounding), self.get_prob_vector(1)
-
-    def get_prob_vector(self, axis=0, rounding=None):
-        '''return prob vector
-        axis 0 = x
-        axis 1 = y
-        '''
-
+    def get_prob_vector(self, axis: int = 0, rounding: int = None) -> Dict[float, float]:
+        '''Return probability vector for a given axis.'''
         if axis == 0:
             vector = self.x
-        else:
+        elif self.y is not None:
             vector = self.y
-        single_values = set(vector)
+        else:
+            raise ValueError("Invalid axis for probability vector.")
+
         if rounding is not None:
-            vector = np.array([round(num, rounding) for num in single_values])
+            vector = np.round(vector, rounding)
 
-        single_values = set(vector)
-        # print(len(single_values), len(vector))
+        unique_values = np.unique(vector)
+        prob_dict = {value: self.count(
+            vector, value) / self.n for value in unique_values}
+        return prob_dict
 
-        self.prob_dict = {data_point: self.count(
-            vector, data_point)/self.n for data_point in single_values}
+    def plot_pdf(self, bins: int = 'auto'):
+        '''Plots the Probability Density Function (PDF) of the vector.'''
+        if self.y is not None:
+            data = self.y
+        else:
+            data = self.x
 
-        return self.prob_dict
+        density, bins, _ = plt.hist(
+            data, bins=bins, density=True, alpha=0.5, label='PDF')
+        plt.ylabel('Probability')
+        plt.xlabel('Data')
+        plt.title('Probability Density Function')
+        plt.legend()
+        plt.show()
 
-    def savitzky_golay_filter(self, window=3):
-        '''returns vector after smoothing with savitzky-golay filter'''
-        pass
+    def plot_basic_stats(self):
+        '''Plots basic statistics: mean and standard deviation.'''
+        if self.y is not None:
+            data = self.y
+        else:
+            data = self.x
+
+        mean = np.mean(data)
+        std = np.std(data)
+
+        plt.hist(data, bins='auto', alpha=0.5, label='Data')
+        plt.axvline(mean, color='r', linestyle='dashed',
+                    linewidth=1, label=f'Mean: {mean:.2f}')
+        plt.axvline(mean + std, color='g', linestyle='dashed',
+                    linewidth=1, label=f'Std: {std:.2f}')
+        plt.axvline(mean - std, color='g', linestyle='dashed', linewidth=1)
+        plt.legend()
+        plt.show()
+
+    def rolling_average(self, window_size: int = 3) -> np.array:
+        '''Calculates and returns the rolling average of the vector using numpy.'''
+        if self.y is not None:
+            data = self.y
+        else:
+            data = self.x
+
+        cumsum = np.cumsum(np.insert(data, 0, 0))
+        return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
 
     @staticmethod
-    def generate_nosiey_sin(start=0, points=100):
-        ''' create a sine wave for testing'''
-        # Step 1: Generate Sample Data
-        x = np.linspace(start, 2 * np.pi, points)  # 100 points from 0 to 2π
-        y = np.sin(x) + np.random.normal(start, 0.2, points)
-        return (x, y)
+    def calculate_entropy(prob_dist1: np.array, prob_dist2: np.array) -> float:
+        '''Calculates the entropy between two probability distributions.'''
+        # Ensure the probability distributions are normalized
+        prob_dist1 = prob_dist1 / np.sum(prob_dist1)
+        prob_dist2 = prob_dist2 / np.sum(prob_dist2)
 
+        # Calculate the entropy
+        return -np.sum(prob_dist1 * np.log(prob_dist2 / prob_dist1))
 
-if __name__ == "__main__":
-    data = Vector.generate_nosiey_sin()
-    v1 = Vector(label=0, data_points=data)
-    d = v1.get_prob_vector(rounding=2)
+    @staticmethod
+    def set_operations(v1: 'Vector', v2: 'Vector') -> Tuple[Set[float], Set[float], float]:
+        '''Performs set operations: union, intersection, and calculates Jaccard index.'''
+        set1 = set(v1.x)
+        set2 = set(v2.x)
+
+        union = set1.union(set2)
+        intersection = set1.intersection(set2)
+        jaccard_index = len(intersection) / len(union)
+
+        return union, intersection, jaccard_index
+
+    @staticmethod
+    def generate_noisy_sin(start: float = 0, points: int = 100) -> Tuple[np.array, np.array]:
+        '''Creates a noisy sine wave for testing.'''
+        x = np.linspace(start, 2 * np.pi, points)
+        y = np.sin(x) + np.random.normal(0, 0.2, points)
+        return np.column_stack((x, y))

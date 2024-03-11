@@ -1,8 +1,8 @@
 import numpy as np
 from typing import *
 import matplotlib.pyplot as plt
-from utils.neurons import Neuron
-from utils.vectors import Vector
+from neurons import Neuron
+from vectors import Vector
 
 
 class Layer:
@@ -27,17 +27,13 @@ class Layer:
         self.weights: np.array = weights  # vectorized neuron weights
 
     def create_neurons(self, number_of_neurons: int):
-        '''
-        creates self.neurons: np.array of neurons based on datapoints
-        creates self.weights: np.array of 2x3 weights based on neurons
-
-
-        '''
+        # Ensure number_of_neurons does not exceed the length of self.x and self.y
+        number_of_neurons = min(number_of_neurons, len(self.x), len(self.y))
         self.neurons = np.array([Neuron([self.x[idx], self.y[idx]], layer=1, label=self.name)
                                  for idx in range(number_of_neurons)])
         self.weights = np.array([neuron.weights for neuron in self.neurons])
         self.inputs = np.array([[neuron.x, neuron.state, 1]
-                               for neuron in self.neurons])
+                                for neuron in self.neurons])
         return self.inputs, self.weights
 
     def feed_forward(self):
@@ -61,7 +57,7 @@ class Layer:
 
 
 if __name__ == "__main__":
-    sine_wave = np.array(Vector.generate_nosiey_sin())
+    sine_wave = np.array(Vector.generate_noisy_sin())
 
     layer_input = Layer(sine_wave)
     inputs, weights = layer_input.create_neurons(len(sine_wave[0]))

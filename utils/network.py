@@ -1,9 +1,10 @@
-from utils.layers import Layer
-from utils.vectors import Vector
+from layers import Layer
+from vectors import Vector
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from typing import *
+import numpy as np
 
 
 class Network:
@@ -20,12 +21,10 @@ class Network:
         self.layers[0] = self.input_layer
 
     def init_network(self, layers: int = 5):
-        '''train all layers in network save for input'''
-
-       # skiping layer 0 as that is the input layer
-        for idx in range(layers):
+        # Initialize layers including the input layer correctly
+        for idx in range(1, layers + 1):  # Start from 1 since 0 is the input layer
             delta_layer = Layer(data_points=self.df,
-                                layer_number=idx, name="hidden_layer")
+                                layer_number=idx, name=f"hidden_layer_{idx}")
             delta_layer.create_neurons(number_of_neurons=self.n)
             self.layers[idx] = delta_layer
         return self.layers
@@ -103,7 +102,7 @@ class Network:
 
 
 if __name__ == "__main__":
-    sine_wave = np.array(Vector.generate_nosiey_sin())
+    sine_wave = np.array(Vector.generate_noisy_sin())
     network_example = Network(dataset=sine_wave)
     network_example.init_network(layers=3)
     network_example.train_network(epochs=2)

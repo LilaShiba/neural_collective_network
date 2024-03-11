@@ -1,7 +1,7 @@
 import numpy as np
 from typing import *
 import matplotlib.pyplot as plt
-from utils.vectors import Vector
+from vectors import Vector
 
 
 class Neuron():
@@ -79,22 +79,14 @@ class Neuron():
 if __name__ == "__main__":
     # Example usage:
     print('begin test')
-    sine_wave = np.array(Vector.generate_nosiey_sin())
+    sine_wave = np.array(Vector.generate_noisy_sin())
     one_point = np.array([sine_wave[0][0], sine_wave[1][0]])
     neuron = Neuron(inputs=one_point, layer=1)
     for x in range(100):
         neuron.iterate()
-        if x % 10 == 0:
-            print(
-                f" iteratrion:{x} state:{neuron.state} output:{neuron.output}")
-            print('')
+        # if x % 10 == 0:
+        #     print(
+        #         f" iteratrion:{x} state:{neuron.state} output:{neuron.output}")
+        #     print('')
 
-    # neuron.iterate()
-    # print(neuron.weights)
-
-    # n2 = Neuron(inputs=[1, 2], layer=2, weights=neuron.weights)
-    # print(n2.feed_forward())
-    # # print(n2.weights)
-    # print('')
-    # print(n2.state)
     print(f' prediction: {neuron.output} res: {neuron.y}')
