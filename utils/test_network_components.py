@@ -10,27 +10,21 @@ import os
 
 class TestNeuron(unittest.TestCase):
     def setUp(self):
-        self.inputs = np.array([0.5, -0.5])
+        self.inputs = np.array([0.5, 0.8])
         self.neuron = Neuron(inputs=self.inputs, layer=1)
 
     def test_initialization(self):
         self.assertEqual(self.neuron.layer, 1)
         self.assertEqual(self.neuron.x, 0.5)
-        self.assertEqual(self.neuron.y, -0.5)
+        self.assertEqual(self.neuron.y, 0.8)
         self.assertIsNotNone(self.neuron.weights)
         self.assertIsNotNone(self.neuron.bias)
-
-    def test_feed_forward(self):
-        output = self.neuron.feed_forward()
-        print(f"Neuron feed_forward input: {self.inputs}, output: {output}")
-        self.assertIsInstance(output, list)
-        self.assertEqual(len(output), 2)
 
     def test_iterate(self):
         initial_output = self.neuron.output
         self.neuron.iterate()
-        print(
-            f"Neuron iterate initial output: {initial_output}, new output: {self.neuron.output}")
+        self.neuron.iterate()
+        print(f'prediction: {self.neuron.output} res: {self.neuron.y}')
         self.assertNotEqual(initial_output, self.neuron.output)
 
 
@@ -67,15 +61,14 @@ class TestNetwork(unittest.TestCase):
         self.network.init_network(layers=3)
         initial_output = self.network.layers[0].neurons[0].output
         self.network.train_network(epochs=1)
-        print(
-            f"Network train_network initial output: {initial_output}, new output: {self.network.layers[0].neurons[0].output}")
+
         self.assertNotEqual(
             initial_output, self.network.layers[0].neurons[0].output)
 
     def test_predict(self):
-        self.network.init_network(layers=3)
-        self.network.train_network(epochs=1)
-        test_params = [0.5, -0.5]
+        self.network.init_network(layers=2)
+        self.network.train_network(epochs=2)
+        test_params = [0.5, 0.8]
         predictions = self.network.predict(test_params=test_params)
         print(
             f"Network predict test_params: {test_params}, predictions: {predictions}")

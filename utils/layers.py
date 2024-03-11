@@ -57,12 +57,12 @@ class Layer:
 
 
 if __name__ == "__main__":
-    sine_wave = np.array(Vector.generate_noisy_sin())
-
-    layer_input = Layer(sine_wave)
+    sine_wave = Vector.generate_noisy_sin()
+    x, y = sine_wave[:, 0].tolist(), sine_wave[:, 1].tolist()
+    layer_input = Layer([x, y])
     inputs, weights = layer_input.create_neurons(len(sine_wave[0]))
     # state, output = layer_input.feed_forward()
     # print(layer_input.neurons[0].weights)
-    vect_neurons = layer_input.train(epochs=12)
+    vect_neurons = layer_input.train(epochs=2)
     print(
         f' prediction: {vect_neurons[0].output} | ground truth: {vect_neurons[0].y}')
