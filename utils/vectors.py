@@ -88,20 +88,23 @@ class Vector:
         Calculates the entropy between two aligned probability distributions from Vector instances.
         """
 
-        # Combine and find unique values across both vectors
-        all_values = np.unique(np.concatenate(
-            (vector1.x, vector2.y)))
-
         # Create probability distributions with zeros for missing values in each vector
-        prob_dist1 = list(vector1.get_prob_vector().values())
-        prob_dist2 = list(vector2.get_prob_vector().values())
+        prob_dist1 = np.array(list(vector1.get_prob_vector().values()))
+        prob_dist2 = np.array(list(vector2.get_prob_vector().values()))
 
         # Ensure the probability distributions are normalized
-        prob_dist1 = prob_dist1 / np.sum(prob_dist1)
-        prob_dist2 = prob_dist2 / np.sum(prob_dist2)
+        # prob_dist1 = prob_dist1 / np.sum(prob_dist1)
+        # prob_dist2 = prob_dist2 / np.sum(prob_dist2)
+        # Calculate joint probabilities
+        joint_probs = prob_dist1 * prob_dist2
+
+        # Filter out zero probabilities to avoid NaNs in the logarithm
+        joint_probs = joint_probs[joint_probs != 0]
+
+        # Calculate entropy
+        entropy = -np.sum(joint_probs * np.log2(joint_probs))
 
         # Calculate the entropy
-        entropy = -np.sum(prob_dist1 * np.log(prob_dist2))
         return entropy
 
     @staticmethod
