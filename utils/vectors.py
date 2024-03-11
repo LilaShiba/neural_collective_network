@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import *
+import collections
 
 
 class Vector:
@@ -11,15 +12,46 @@ class Vector:
         if data_points is not None:
             self.v = data_points
             self.n = len(data_points)
-            self.x = data_points[:, 0]
+
             if data_points.ndim == 2 and data_points.shape[1] > 1:
+                self.x = data_points[:, 0]
                 self.y = data_points[:, 1]
             else:
+                self.x = data_points
                 self.y = None
 
     def count(self, array: np.array, value: float) -> int:
         '''Returns count of value in an array.'''
         return len(array[array == value])
+
+    def linear_scale(self):
+        histo_gram = collections.Counter(self.x)
+        val, cnt = zip(*histo_gram.items())
+
+        n = len(cnt)
+        prob_vector = [x / n for x in cnt]
+        plt.plot(val, prob_vector, 'x')
+        plt.show()
+
+    def log_binning(self) -> Tuple[float, float]:
+        """Plot the degree distribution with log binning."""
+        histo_gram = collections.Counter(self.x)
+        val, cnt = zip(*histo_gram.items())
+
+        n = len(cnt)
+        prob_vector = [x / n for x in cnt]
+        in_max, in_min = max(prob_vector), min(prob_vector)
+        log_bins = np.logspace(np.log10(in_min), np.log10(in_max))
+        deg_hist, log_bin_edges = np.histogram(
+            prob_vector, bins=log_bins, density=True, range=(in_min, in_max))
+        plt.title(f"Log Binning & Scaling")
+        plt.xscale("log")
+        plt.yscale("log")
+        plt.xlabel('K')
+        plt.ylabel('P(K)')
+        plt.plot(deg_hist, log_bin_edges[:-1], 'o')
+        plt.show()
+        return in_min, in_max
 
     def get_prob_vector(self, axis: int = 0, rounding: int = None) -> Dict[float, float]:
         '''Return probability vector for a given axis.'''
@@ -111,7 +143,7 @@ class Vector:
     def set_operations(v1: 'Vector', v2: 'Vector') -> Tuple[Set[float], Set[float], float]:
         '''Performs set operations: union, intersection, and calculates Jaccard index.'''
         set1 = set(v1.x)
-        set2 = set(v2.x)
+        set2 = set(v2.y)
 
         union = set1.union(set2)
         intersection = set1.intersection(set2)
@@ -125,3 +157,19 @@ class Vector:
         x = np.linspace(start, 2 * np.pi, points)
         y = np.sin(x) + np.random.normal(0, 0.2, points)
         return np.column_stack((x, y))
+
+
+if __name__ == "__main__":
+    # Set parameters
+    mean = 50
+    std_dev = 10
+    sample_size = 2000
+
+    # Generate the sample list
+    s1 = np.round(np.random.normal(mean, std_dev, sample_size), 2)
+    s2 = np.round(np.random.normal(mean, std_dev, sample_size), 2)
+
+    v1 = Vector('1', s1)
+    v2 = Vector('2', s2)
+    v1.linear_scale()
+    v1.log_binning()
